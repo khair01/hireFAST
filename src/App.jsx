@@ -1,13 +1,13 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
 import Signup from './pages/Signup'
-import Home from './components/Home'
+import Home from './pages/Home'
 export default function App() {
   return (
     <div>
-      <Home />
+      {/* <Home /> */}
       {/* <SignIn /> */}
-      {/* <Signup /> */}
+      <Signup />
     </div>
   )
 }

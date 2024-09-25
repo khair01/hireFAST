@@ -25,7 +25,7 @@ export default function Signup({
     );
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        const res = await fetch("/signup/api", {
+        const res = await fetch("http://localhost:3000/auth/signup", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

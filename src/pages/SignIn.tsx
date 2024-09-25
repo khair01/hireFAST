@@ -15,28 +15,29 @@ export default function Signin() {
             resolver: zodResolver(registerschema)
         }
     );
-    // const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    //     const { email, password } = data;
-    //     try {
-    //         const response: any = await signIn("credentials", {
-    //             email,
-    //             password,
-    //             redirect: false,
-    //         });
-    //         console.log(response);
-    //         if (!response.error) {
-    //             console.log("aaa")
-    //             router.push("/dashboard")
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        const { email, password } = data;
+        try {
+            const res = await fetch("http://localhost:3000/auth/signin", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
 
-    //         }
-    //         if (!response.ok) {
-    //             console.log("error");
-    //         }
+            if (!res.ok) {
+                console.log("Registration failed");
+            } else {
+                console.log("Registered successfully");
 
-    //     } catch (e) {
+            }
 
-    //     }
-    // }
+        } catch (e) {
+
+        }
+    }
     return (
         <>
             <div className="bg-cover w-screen h-screen flex justify-center items-center text-white ">
@@ -45,7 +46,7 @@ export default function Signin() {
                     <form
                         action={'#'}
                         className="flex flex-col text-sm mt-10 md:w-2/3"
-                    // onSubmit={handleSubmit(onSubmit)}
+                        onSubmit={handleSubmit(onSubmit)}
                     >
                         <label htmlFor="username" className="" >email</label>
                         <input
