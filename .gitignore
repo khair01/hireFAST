@@ -1,5 +1,6 @@
 # Logs
 # Editor directories and files
+node_modules
 .vscode/*
 !.vscode/extensions.json
 .idea
