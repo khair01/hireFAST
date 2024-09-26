@@ -8,12 +8,8 @@ import auth from './routes/auth.js';
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+console.log("heyyy")
 
-client.connect()
-    .then(console.log("database connected"))
-    .catch(err => {
-        console.log("error connecting to database");
-    });
 app.use('/auth', auth)
 
 app.listen(3000, () => {
