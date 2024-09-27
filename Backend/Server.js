@@ -1,25 +1,18 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { client } from './database.js'
+import userRoute from './routes/user.route.js'; // Correct import
+
 const app = express();
-import auth from './routes/auth.js';
 
 app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-console.log("heyyy")
 
-app.use('/auth', auth)
+// Use the user route correctly
+app.use('/user', userRoute);
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(8000, () => {
+    console.log('Server is running on port 8000');
 });
-
-
-
-//0Ve4vZuYyGnW02tR
-// dynamic url code
-// app.get('/blogs/:id', (req, res) => {
-//     const id=req.params.id
-// })
