@@ -6,12 +6,42 @@ import { FaGithub } from "react-icons/fa";
 import React from "react";
 import { Link } from "react-router-dom";
 
+// firstName, lastName, email, phone_number, password, role
 
-const registerschema = z.object({
-    email: z.string().email(),
-    password: z.string().min(5)
-})
-type FormFields = z.infer<typeof registerschema>
+const registerSchema = z.object({
+    firstName: z.string().min(4, "First name should be at least 4 characters long").max(48, "First name should be no longer than 48 characters"),
+    lastName: z.string().min(4, "Last name should be at least 4 characters long").max(40, "Last name should be no longer than 40 characters"),
+    email: z.string().email("Invalid email address"),
+    phone_number: z.string().length(11, "Phone number must be exactly 11 digits"),
+    password: z.string().min(5, "Password should be at least 5 characters long").max(40, "Password should be no longer than 40 characters"),
+    role: z.enum(["student", "recruiter"], {
+        errorMap: (issue, ctx) => ({ message: 'role should be either student or recruiter' })
+    })
+});
+
+
+const formdata = [{
+    name: "firstName",
+    type: 'text'
+},
+{
+    name: "lastName",
+    type: 'text'
+},
+{
+    name: "email",
+    type: 'text'
+},
+{
+    name: "phone_number",
+    type: 'text'
+},
+{
+    name: "password",
+    type: 'password',
+},
+]
+type FormFields = z.infer<typeof registerSchema>
 
 export default function Signup({
     children,
@@ -20,17 +50,22 @@ export default function Signup({
 }) {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormFields>(
         {
-            resolver: zodResolver(registerschema)
+            resolver: zodResolver(registerSchema)
         }
     );
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        const res = await fetch("http://localhost:3000/auth/signup", {
+        const res = await fetch("http://localhost:8000/user/register", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                firstName: data.firstName,
+                lastName: data.lastName,
                 email: data.email,
-                password: data.password
+                phone_number: data.phone_number,
+                password: data.password,
+                role: data.role
+
             })
         });
 
@@ -44,49 +79,61 @@ export default function Signup({
 
     return (
         <>
-            <div className=" w-screen h-screen flex justify-center items-center  text-white">
-                <div className="bg-black w-3/5 md:w-2/5 h-fit py-6 pb-20 flex flex-col items-center max-w-2xl border-gray-50 border-[1px]">
-                    <h1 className="pt-14 font-semibold text-3xl font-serif">Sign Up</h1>
-                    <form action="#" className="flex flex-col text-sm mt-10 md:w-2/3" onSubmit={handleSubmit(onSubmit)}>
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="text"
-                            id="email"
-                            autoComplete="off"
-                            className="focus:outline-none active:outline-none bg-transparent border-b border-blue-300"
-                            {...register("email")}
-                        />
-                        {errors.email && <div className='text-red-600'>{errors.email.message}</div>}
+            <div className="flex justify-center items-center min-h-screen bg-gray-100">
+                <div className="bg-white border-purple-950 w-11/12 md:w-2/5 py-6 px-8 flex flex-col items-center max-w-lg border-2 border- rounded-md shadow-md">
+                    <h1 className="pt-8 font-semibold text-3xl font-serif text-purple-800">Sign Up</h1>
+                    <form action="#" className="flex flex-col text-sm mt-6 w-full" onSubmit={handleSubmit(onSubmit)}>
+                        {formdata.map((element, index) => {
+                            return (
+                                <React.Fragment key={index}>
+                                    <label htmlFor={element.name} className=" mt-1">{element.name.toLowerCase()}</label>
+                                    <input
+                                        type={element.type}
+                                        id={element.name}
+                                        autoComplete="off"
+                                        className="focus:outline-none bg-transparent border-b border-purple-600"
+                                        {...register(element.name as keyof FormFields)}
+                                    />
+                                    {errors[element.name as keyof FormFields] && (
+                                        <div className='text-red-600'>
+                                            {errors[element.name as keyof FormFields]?.message}
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                        <label htmlFor="role" className="mt-2">Choose a Role</label>
 
-                        <label htmlFor="password" className="mt-4">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            className="focus:outline-none bg-transparent border-b border-blue-300"
-                            {...register("password")}
-                        />
-                        {errors.password && <div className='text-red-600'>{errors.password.message}</div>}
+                        <select id="role" className="border-[1px] border-purple-950 active:outline-none "
+                            defaultValue=''
+                            {...register("role")}
+
+                        >
+                            <option value="" disabled>Select Option</option>
+                            <option value="student">Student</option>
+                            <option value="recruiter">Recruiter</option>
+
+                        </select>
 
                         <Link to={'/SignIn'} className="text-xs pt-1 text-gray-400 underline underline-offset-2 opacity-80 hover:opacity-100 mt-1 md:text-sm w-full">Already have an account?</Link>
 
                         <button
-                            className="bg-zinc-900 mt-4 my-3 border-[1px] rounded-sm hover:bg-zinc-950 py-2"
+                            className="btn-primary"
                             type="submit"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? "Submitting..." : "Sign Up"}
                         </button>
-                        {/* <CheckoutForm /> */}
                     </form>
 
                     <div className="my-4 flex items-center w-full">
-                        <span className="flex-grow h-px bg-gray-500 opacity-25 "></span>
+                        <span className="flex-grow h-px bg-gray-500 opacity-25"></span>
                         <p className="mx-4">OR</p>
                         <span className="flex-grow h-px bg-gray-500 opacity-25"></span>
                     </div>
 
                     <button
-                        className="flex bg-black py-2 mb-4 w-7/12 md:w-8/12 mx-auto hover:bg-zinc-800"
+                        className="flex bg-white border-[1px] border-black py-2 mb-4 w-7/12 md:w-8/12 mx-auto hover:bg-zinc-800"
                         onClick={async (e) => {
                             e.preventDefault();
                         }}
@@ -96,7 +143,7 @@ export default function Signup({
                     </button>
 
                     <button
-                        className="flex bg-white text-black py-1 mx-auto w-7/12 md:w-8/12 hover:bg-gray-500"
+                        className="flex bg-blue-500 text-black py-2 mx-auto w-7/12 md:w-8/12 hover:bg-gray-500"
                         onClick={async (e) => {
                             e.preventDefault();
                         }}

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 export const register = async (req, res) => {
     let { firstName, lastName, email, phone_number, password, role } = req.body;
 
-    if (!firstName || !lastName || !email  || !password || !role) {
+    if (!firstName || !lastName || !email || !password || !role) {
         return res.status(400).json({
             message: "Some Fields are missing",
             success: false
@@ -12,7 +12,7 @@ export const register = async (req, res) => {
     }
 
     const { data: existingUser, error: fetchError } = await client
-        .from('users') 
+        .from('users')
         .select('email')
         .eq('email', email)
         .single();
@@ -26,7 +26,7 @@ export const register = async (req, res) => {
 
     const { error: insertError } = await client
         .from('users')
-        .insert([{ first_name:firstName, last_name:lastName, email: email, phone_number: phone_number, password: hashedPassword, role }]);
+        .insert([{ first_name: firstName, last_name: lastName, email: email, phone_number: phone_number, password: hashedPassword, role }]);
 
     if (insertError) {
         console.error('Error inserting data:', insertError);
@@ -44,7 +44,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     let { email, password, role } = req.body;
 
-    if (!email || !password || !role) {
+    if (!email || !password) {
         return res.status(400).json({
             message: "Some Fields are missing",
             success: false
@@ -53,11 +53,11 @@ export const login = async (req, res) => {
 
     const { data: user, error: fetchError } = await client
         .from('users')
-        .select('first_name,last_name,email, password, role')  
+        .select('first_name,last_name,email, password, role')
         .eq('email', email)
         .single();
 
-  
+
     if (fetchError || !user) {
         return res.status(400).json({
             message: "User does not exist",
@@ -75,28 +75,28 @@ export const login = async (req, res) => {
     }
 
     // Check if the role matches
-    if (role !== user.role) {
-        return res.status(400).json({
-            message: "Invalid Role",
-            success: false
-        });
-    }
+    // if (role !== user.role) {
+    //     return res.status(400).json({
+    //         message: "Invalid Role",
+    //         success: false
+    //     });
+    // }
 
     // Generate JWT token if login is successful
     const token_data = { email: user.email, role: user.role }; // Simplified token data
-    const token = jwt.sign(token_data, 'hireFAST', { expiresIn: '1h' });
+    const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.cookie('token', token, { 
+    res.cookie('token', token, {
         maxAge: 1 * 24 * 60 * 60 * 1000,  // 1 day
         httpOnly: true,
-        secure: true, 
-        sameSite: 'strict' 
+        secure: false, //only to be set true in production
+        sameSite: 'Strict'
     });
 
     return res.status(200).json({
         message: `Welcome Back ${user.first_name} ${user.last_name}`,
         success: true,
-        // token: token
+        token: token
     });
 };
 
