@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-
+import axios from 'axios';
 const registerschema = z.object({
     email: z.string().email(),
     password: z.string().min(5)
@@ -19,29 +19,42 @@ export default function Signin() {
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         const { email, password } = data;
         try {
-            const res = await fetch("http://localhost:8000/user/login", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const res = await axios.post(
+                "http://localhost:8000/user/login",
+                {
                     email: email,
                     password: password
-                }),
-
-            }
+                },
+                {
+                    withCredentials: true
+                }
             );
+            console.log(res.data); // Axios puts the response body in `data`
+            console.log("Registered successfully");
+            // const res = await fetch("http://localhost:8000/user/login", {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         email: email,
+            //         password: password
+            //     }),
 
-            if (!res.ok) {
-                console.log(res);
-                console.log("Registration failed");
-            } else {
-                const result = await res.json();
-                console.log(result);
-                console.log("Registered successfully");
+            // }
+            // );
 
-            }
+            // if (!res.ok) {
+            //     console.log(res);
+            //     console.log("Registration failed");
+            // } else {
+            //     const result = await res.json();
+            //     console.log(result);
+            //     console.log("Registered successfully");
 
-        } catch (e) {
-            console.log(e)
+            // }
+
+        } catch (error) {
+            console.log(error.response ? error.response.data : error.message);
+            console.log("Registration failed");
         }
     }
     return (

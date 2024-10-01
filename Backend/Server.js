@@ -5,22 +5,18 @@ import userRoute from './routes/user.route.js'; // Correct import
 import cookieParser from 'cookie-parser'
 import authMiddleware from './middleware/confirmuser.js';
 const app = express();
-
-app.use(cors());
-
-// Enable CORS
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-
 
 const corsOptions = {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],// Specify the exact origin
     credentials: true, // Allow credentials (cookies)
+    allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
 // Use the user route correctly
 app.use('/user', userRoute);

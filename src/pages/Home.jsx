@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react'
-
+import axios from 'axios';
 export default function Home() {
   const [isVerified, setisverified] = useState(false);
   useEffect(() => {
     const verifyUser = async () => {
-      const res = await fetch("http://localhost:8000/protected", {
-        method: 'GET',
-        credentials: 'include' //to include cookies in request
+      axios.get("http://localhost:8000/protected", {
+        withCredentials: true
       })
-      if (!res.ok) {
-        setisverified(false)
-        return;
-      }
-      const result = await res.json();
-      console.log(result.message);
-      setisverified(true)
-
-      return
+        .then(res => {
+          console.log(res.data); // Handle success
+          return;
+        })
+        .catch(err => {
+          console.error(err); // Handle error
+          return;
+        });
     }
     verifyUser();
   }, [])

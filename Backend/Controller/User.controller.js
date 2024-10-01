@@ -86,18 +86,16 @@ export const login = async (req, res) => {
     const token_data = { email: user.email, role: user.role }; // Simplified token data
     const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.cookie('token', token, {
+    res.cookie('jwttoken', token, {
         maxAge: 1 * 24 * 60 * 60 * 1000,  // 1 day
         httpOnly: true,
-        secure: false, //only to be set true in production
-        sameSite: 'Strict'
-    });
-
-    return res.status(200).json({
+        sameSite: 'Lax',
+        secure: false
+    }).status(200).json({
         message: `Welcome Back ${user.first_name} ${user.last_name}`,
         success: true,
         token: token
-    });
+    });;
 };
 
 export const Logout = async (req, res) => {

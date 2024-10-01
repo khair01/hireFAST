@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 const authMiddleware = (req, res, next) => {
     // Get the token from the cookie
-    const token = req.cookies.token; // Use req.cookies if using cookie-parser
+    const token = req.cookies.jwttoken; // Use req.cookies if using cookie-parser
     console.log("token from middleware", token);
     if (!token) {
         return res.status(403).json({ message: 'Access denied, no token provided' });
