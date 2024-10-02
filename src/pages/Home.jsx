@@ -1,27 +1,12 @@
 
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-export default function Home() {
-  const [isVerified, setisverified] = useState(false);
-  useEffect(() => {
-    const verifyUser = async () => {
-      axios.get("http://localhost:8000/protected", {
-        withCredentials: true
-      })
-        .then(res => {
-          console.log(res.data); // Handle success
-          return;
-        })
-        .catch(err => {
-          console.error(err); // Handle error
-          return;
-        });
-    }
-    verifyUser();
-  }, []);
-  const navigate = useNavigate();
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
+export default function Home() {
+  const { isAuthorized, loading, role } = useAuth();
+  const navigate = useNavigate();
   const [navbarColor, setNavbarColor] = useState("bg-customWhite");
   const [textColor, setTextColor] = useState("text-customBlack");
   const [buttonTextColor, setButtonTextColor] = useState("text-customPurple");
@@ -64,10 +49,15 @@ export default function Home() {
     };
   }, []);
 
-  const handleSignIn = () => {
-    navigate("/signin");
-  };
+  if (loading) {
+    return (
+      <h1>loading....</h1>
+    );
 
+  }
+  if (!isAuthorized) {
+    return <Navigate to="/signin" replace />;
+  }
   return (
     <div>
       <nav
@@ -77,17 +67,16 @@ export default function Home() {
           hireFAST
         </div>
         <div>
-          <button
+          <Link to="signin"
             className={`mx-6 font-lato ${buttonTextColor}`}
-            onClick={handleSignIn}
           >
             Sign in
-          </button>
-          <button
+          </Link>
+          <Link to="signup"
             className={`px-4 py-2 rounded-full hover:drop-shadow-l font-lato ${signUpButtonColor}`}
           >
             Sign up
-          </button>
+          </Link>
         </div>
       </nav>
 
@@ -95,15 +84,12 @@ export default function Home() {
         <h1 className="text-[200px] font-montserrat font-bold text-customBlack mx-10 -mt-20">
           hire<span className="text-customPurple">FAST</span>
         </h1>
-        <p className="text-[18px] font-roboto text-customBlack mx-11 -mt-10">
-          hireFAST eliminates the hassle of long queues and inefficient QR-code
-          applications during university events.<br></br> Our platform
-          streamlines the recruitment process by allowing students to easily
-          create profiles and apply for <br></br>job opportunities posted by
-          companies. Whether you're attending DevDay or Procom, <br />
-          hireFAST ensures a seamless, efficient experience, giving you more
-          time to focus on what matters – building your future.
-        </p>
+        <div className=' w-3/4 text-wrap'>
+          <p className="text-[18px] font-roboto text-customBlack mx-11 -mt-10 whitespace-pre-line">
+            hireFAST streamlines university event recruitment by simplifying student
+            profiles and job applications, eliminating long queues and inefficient QR-code processes. It ensures a seamless experience for events like DevDay and Procom, letting students focus on their future.
+          </p>
+        </div>
         <button className="bg-customPurple text-white px-8 py-4 rounded-full hover:drop-shadow-l font-lato mx-10 mt-6">
           Apply Now
         </button>

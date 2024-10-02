@@ -8,6 +8,11 @@ export default {
         customWhite: "#e9ecef",
         customBlack: "#02010a",
       },
+      fontFamily: {
+        Roboto: ['Roboto', 'sans-serif'],
+        Lato: ['Lato', 'sans-serif'],
+        Montserrat: ['Montserrat', 'sans-serif'],
+      }
     },
   },
   plugins: [],

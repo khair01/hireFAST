@@ -76,7 +76,7 @@ export default function Signin() {
                         <label htmlFor="password" className="">password</label>
                         <input type="password"  {...register("password")} id="password" className="focus:outline-none  bg-transparent border-b border-blue-300" />
                         {errors.password && <div className='text-red-600'>{errors.password.message}</div>}
-                        <Link to={'/'} className="text-xs text-gray-400 pt-1 underline underline-offset-2 opacity-80 hover:opacity-100 mt-1 md:text-sm w-full">Dont have an account?</Link>
+                        <Link to={'/signup'} className="text-xs text-gray-400 pt-1 underline underline-offset-2 opacity-80 hover:opacity-100 mt-1 md:text-sm w-full">Dont have an account?</Link>
                         <button className="btn-primary" type="submit">{isSubmitting ? "Submitting..." : "Sign In"}</button>
                     </form>
                 </div>
