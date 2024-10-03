@@ -6,24 +6,64 @@ import Home from "./pages/Home.jsx";
 import Signup from "./pages/Signup.tsx";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
+import AdminDashboard from "./pages/AdminDashboard.tsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ProtectedRoute } from "./Routes/ProtectedRoutes.tsx";
+import StudentDashboard from "./pages/StudentDashboard.tsx";
+import RecruiterDashboard from "./pages/RecruiterDashboard.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
   },
   {
-    path: "/SignIn",
+    path: "/signin",
     element: <SignIn />,
   },
   {
-    path: "/SignUp",
+    path: "/signup",
     element: <Signup />,
   },
+  {
+    path: "/dashboard/admin",
+
+    element:
+      (
+        <ProtectedRoute role="admin">
+          <AdminDashboard />
+        </ProtectedRoute>
+
+      )
+  },
+  {
+    path: "/dashboard/student",
+
+    element:
+      (
+        <ProtectedRoute role="student">
+          <StudentDashboard />
+        </ProtectedRoute>
+
+      )
+  },
+  {
+    path: "/dashboard/recruiter",
+
+    element:
+      (
+        <ProtectedRoute role="admin">
+          <RecruiterDashboard />
+        </ProtectedRoute>
+
+      )
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider >
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 );

@@ -90,20 +90,34 @@ export const login = async (req, res) => {
         maxAge: 1 * 24 * 60 * 60 * 1000,  // 1 day
         httpOnly: true,
         sameSite: 'Lax',
-        secure: false
-    }).status(200).json({
-        message: `Welcome Back ${user.first_name} ${user.last_name}`,
-        success: true,
-        token: token
-    });;
-};
-
-export const Logout = async (req, res) => {
-
-    res.clearCookie('token');
+        secure: false,  // Use secure cookies in production
+    });
 
     return res.status(200).json({
-        message: "Logged Out Successfully",
-        success: true
+        message: `Welcome Back ${user.first_name} ${user.last_name}`,
+        success: true,
+        token,
     });
+};
+
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie("jwttoken", {
+            httpOnly: true,
+            sameSite: 'Lax',
+            secure: false, // Use secure cookies in production
+        });
+
+        return res.status(200).json({
+            message: "Logout successful",
+            success: true
+        });
+
+    }
+    catch (err) {
+        return res.status(500).json({
+            message: "error logging out",
+            success: false
+        });
+    }
 };

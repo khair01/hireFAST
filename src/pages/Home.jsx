@@ -2,11 +2,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from '../context/AuthContext';
+import Signout from '../components/Homepage/Signout.tsx';
+import { useAuth } from '../context/AuthContext.jsx'
+
 
 export default function Home() {
-  const { isAuthorized, loading, role } = useAuth();
-  const navigate = useNavigate();
+  const { authState } = useAuth();
   const [navbarColor, setNavbarColor] = useState("bg-customWhite");
   const [textColor, setTextColor] = useState("text-customBlack");
   const [buttonTextColor, setButtonTextColor] = useState("text-customPurple");
@@ -49,15 +50,6 @@ export default function Home() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <h1>loading....</h1>
-    );
-
-  }
-  if (!isAuthorized) {
-    return <Navigate to="/signin" replace />;
-  }
   return (
     <div>
       <nav
@@ -67,16 +59,21 @@ export default function Home() {
           hireFAST
         </div>
         <div>
-          <Link to="signin"
-            className={`mx-6 font-lato ${buttonTextColor}`}
-          >
-            Sign in
-          </Link>
-          <Link to="signup"
-            className={`px-4 py-2 rounded-full hover:drop-shadow-l font-lato ${signUpButtonColor}`}
-          >
-            Sign up
-          </Link>
+          {!authState.isAuthorized ?
+            (<>
+              <Link to="signin"
+                className={`mx-6 font-lato ${buttonTextColor}`}
+              >
+                Sign in
+              </Link>
+              <Link to="signup"
+                className={`px-4 py-2 rounded-full hover:drop-shadow-l font-lato ${signUpButtonColor}`}
+              >
+                Sign up
+              </Link>
+            </>) :
+            <Signout signUpButtonColor={signUpButtonColor} />
+          }
         </div>
       </nav>
 
