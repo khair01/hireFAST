@@ -87,9 +87,11 @@ export default function Home() {
             profiles and job applications, eliminating long queues and inefficient QR-code processes. It ensures a seamless experience for events like DevDay and Procom, letting students focus on their future.
           </p>
         </div>
-        <button className="bg-customPurple text-white px-8 py-4 rounded-full hover:drop-shadow-l font-lato mx-10 mt-6">
-          Apply Now
-        </button>
+        <Link to="/applynow">
+  <button className="bg-customPurple text-white px-8 py-4 rounded-full hover:drop-shadow-l font-lato mx-10 mt-6">
+    Apply Now
+  </button>
+</Link>
       </section>
 
       <section className="bg-customWhite py-12 px-6">

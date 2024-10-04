@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import SignIn from "./pages/SignIn";
 import Home from "./pages/Home.jsx";
 import Signup from "./pages/Signup.tsx";
+import ApplyJobs from "./pages/ApplyJobs.jsx";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup />,
+  },
+  {
+    path: "/applynow",
+    element: <ApplyJobs />
   },
   {
     path: "/dashboard/admin",
