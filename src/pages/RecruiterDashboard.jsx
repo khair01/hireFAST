@@ -1,9 +1,11 @@
-import React from 'react'
+import React from "react";
+import Navbar from "../components1/navbar";
 
 export default function RecruiterDashboard() {
-    return (
-        <div>
-            hello from recruiter dashboard
-        </div>
-    )
+  return (
+    <div>
+      <Navbar />
+      hello from recruiter dashboard
+    </div>
+  );
 }

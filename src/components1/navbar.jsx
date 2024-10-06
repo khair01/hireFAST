@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Signout from '../components/Homepage/Signout.tsx';
-import { useAuth } from '../context/AuthContext.jsx';
+import Signout from "../components/Homepage/Signout.tsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Navbar() {
   const { authState } = useAuth();
@@ -38,18 +38,18 @@ export default function Navbar() {
     <nav
       className={`${navbarColor} py-4 px-6 flex justify-between items-center fixed top-0 left-0 w-full z-10 transition-colors duration-200`}
     >
-      <div className={`text-3xl font-bold font-montserrat ${textColor}`}>
+      <div className={`text-3xl font-bold font-Montserrat ${textColor}`}>
         hireFAST
       </div>
       <div>
         {!authState.isAuthorized ? (
           <>
-            <Link to="signin" className={`mx-6 font-lato ${buttonTextColor}`}>
+            <Link to="signin" className={`mx-6 font-Lato ${buttonTextColor}`}>
               Sign in
             </Link>
             <Link
               to="signup"
-              className={`px-4 py-2 rounded-full hover:drop-shadow-l font-lato ${signUpButtonColor}`}
+              className={`px-4 py-2 rounded-full hover:drop-shadow-l font-Lato ${signUpButtonColor}`}
             >
               Sign up
             </Link>
