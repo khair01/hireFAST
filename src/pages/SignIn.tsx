@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx'
 const registerschema = z.object({
     email: z.string().email(),
     password: z.string().min(5)
@@ -12,6 +13,7 @@ const registerschema = z.object({
 
 type FormFields = z.infer<typeof registerschema>;
 export default function Signin() {
+    const { authState, setAuthState } = useAuth();
     const Navigate = useNavigate();
     const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<FormFields>(
         {
@@ -31,8 +33,14 @@ export default function Signin() {
                     withCredentials: true
                 }
             );
-            console.log(res.data);
-            console.log("Sign in successfully");
+            // console.log(res.data);
+            // console.log("Sign in successfully");
+
+            setAuthState({
+                role: res.data.role,
+                isAuthorized: true,
+                loading: false
+            })
             Navigate(-1);
 
         } catch (error) {

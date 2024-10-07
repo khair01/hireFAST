@@ -13,7 +13,7 @@ export const ProtectedRoute = ({ children, role }: Props) => {
         return <div>Loading...</div>; // Display a loading indicator while checking auth status
     }
 
-    if (!authState.isAuthorized || authState.role != role) {
+    if (!authState.isAuthorized || !role.includes(authState.role)) {
         return <Navigate to="/signin" replace />;
     }
     else {

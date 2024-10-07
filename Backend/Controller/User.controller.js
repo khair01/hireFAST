@@ -96,7 +96,7 @@ export const login = async (req, res) => {
     return res.status(200).json({
         message: `Welcome Back ${user.first_name} ${user.last_name}`,
         success: true,
-        token,
+        role: user.role
     });
 };
 

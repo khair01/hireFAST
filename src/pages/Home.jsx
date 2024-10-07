@@ -4,17 +4,11 @@ import axios from 'axios';
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Signout from '../components/Homepage/Signout.tsx';
 import { useAuth } from '../context/AuthContext.jsx'
+import Navbar from '../components/Navbar.jsx';
 
 
 export default function Home() {
   const { authState } = useAuth();
-  const [navbarColor, setNavbarColor] = useState("bg-customWhite");
-  const [textColor, setTextColor] = useState("text-customBlack");
-  const [buttonTextColor, setButtonTextColor] = useState("text-customPurple");
-  const [signUpButtonColor, setSignUpButtonColor] = useState(
-    "bg-customPurple text-white"
-  );
-
   const [selectedFeature, setSelectedFeature] = useState("AboutUs");
 
   const featureText = {
@@ -28,55 +22,10 @@ export default function Home() {
       "hireFAST is designed to revolutionize job application processes at university events like DevDay and Procom. By providing a digital platform, we streamline recruitment for students and companies alike. With hireFAST, students can quickly apply to job postings, manage their profiles, and track their application progress—all in one place. For employers, the platform offers an easy way to post jobs, manage applicants, and monitor progress in real-time. Our goal is to eliminate outdated methods and provide a smooth, efficient hiring experience that connects students with potential employers without the hassle.",
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 1) {
-        setNavbarColor("bg-customPurple");
-        setTextColor("text-white");
-        setButtonTextColor("text-white");
-        setSignUpButtonColor("bg-white text-customPurple");
-      } else {
-        setNavbarColor("bg-customWhite");
-        setTextColor("text-customBlack");
-        setButtonTextColor("text-customPurple");
-        setSignUpButtonColor("bg-customPurple text-white");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   return (
     <div>
-      <nav
-        className={`${navbarColor} py-4 px-6 flex justify-between items-center fixed top-0 left-0 w-full z-10 transition-colors duration-200`}
-      >
-        <div className={`text-3xl font-bold font-montserrat ${textColor}`}>
-          hireFAST
-        </div>
-        <div>
-          {!authState.isAuthorized ?
-            (<>
-              <Link to="signin"
-                className={`mx-6 font-lato ${buttonTextColor}`}
-              >
-                Sign in
-              </Link>
-              <Link to="signup"
-                className={`px-4 py-2 rounded-full hover:drop-shadow-l font-lato ${signUpButtonColor}`}
-              >
-                Sign up
-              </Link>
-            </>) :
-            <Signout signUpButtonColor={signUpButtonColor} />
-          }
-        </div>
-      </nav>
-
+      <Navbar />
       <section className="min-h-screen bg-customWhite flex flex-col justify-center items-start">
         <h1 className="text-[200px] font-montserrat font-bold text-customBlack mx-10 -mt-20">
           hire<span className="text-customPurple">FAST</span>
