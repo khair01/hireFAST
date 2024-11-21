@@ -43,7 +43,7 @@ export default function Signin() {
         isAuthorized: true,
         loading: false
       })
-      Navigate(-1);
+      Navigate("/");
 
     } catch (error) {
       console.log(error.response ? error.response.data : error.message);

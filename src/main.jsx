@@ -14,12 +14,35 @@ import { ProtectedRoute } from "./Routes/ProtectedRoutes.tsx";
 import StudentDashboard from "./pages/StudentDashboard.tsx";
 import RecruiterDashboard from "./pages/RecruiterDashboard.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Company from "./pages/Company.tsx";
+import SpecificCompany from "./pages/SpecificCompany.jsx";
+import AddCompany from "./pages/AddCompany.tsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
   },
+  {
+    path: "/Company",
 
+    element:
+      <ProtectedRoute role={["admin", "recruiter"]}>
+        <Company />,
+      </ProtectedRoute>
+    ,
+    children: [
+      {
+        path: ":id",
+        element: <SpecificCompany />
+      },
+      {
+        path: "Add",
+        element: <AddCompany />
+      },
+
+    ],
+  },
   {
     path: "/dashboard",
     element:

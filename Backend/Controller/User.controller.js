@@ -1,123 +1,139 @@
-import { client } from '../Database/database.js'; // import client
+import { pool } from '../Database/database.js'; // Import your PostgreSQL pool configuration
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-export const register = async (req, res) => {
-    let { firstName, lastName, email, phone_number, password, role } = req.body;
 
+// User Registration
+export const register = async (req, res) => {
+    const { firstName, lastName, email, phone_number, password, role } = req.body;
+
+    // Validate input
     if (!firstName || !lastName || !email || !password || !role) {
         return res.status(400).json({
             message: "Some Fields are missing",
-            success: false
+            success: false,
         });
     }
 
-    const { data: existingUser, error: fetchError } = await client
-        .from('users')
-        .select('email')
-        .eq('email', email)
-        .single();
+    try {
+        // Check if user already exists
+        const existingUserQuery = 'SELECT email FROM users WHERE email = $1';
+        const { rows: existingUsers } = await pool.query(existingUserQuery, [email]);
 
-    if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-    }
+        if (existingUsers.length > 0) {
+            return res.status(400).json({ message: "User already exists" });
+        }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-    const { error: insertError } = await client
-        .from('users')
-        .insert([{ first_name: firstName, last_name: lastName, email: email, phone_number: phone_number, password: hashedPassword, role }]);
+        // Insert new user
+        const insertUserQuery = `
+            INSERT INTO users (first_name, last_name, email, phone_number, password, role)
+            VALUES ($1, $2, $3, $4, $5, $6)
+        `;
+        await pool.query(insertUserQuery, [
+            firstName,
+            lastName,
+            email,
+            phone_number,
+            hashedPassword,
+            role,
+        ]);
 
-    if (insertError) {
-        console.error('Error inserting data:', insertError);
+        return res.status(201).json({
+            message: "User Registered Successfully",
+            success: true,
+        });
+    } catch (error) {
+        console.error('Error registering user:', error);
         return res.status(500).json({
             message: "Error creating user",
-            success: false
+            success: false,
         });
     }
-    return res.status(201).json({
-        message: "User Registered Successfully",
-        success: true
-    });
 };
 
+// User Login
 export const login = async (req, res) => {
-    let { email, password, role } = req.body;
+    const { email, password } = req.body;
 
+    // Validate input
     if (!email || !password) {
         return res.status(400).json({
             message: "Some Fields are missing",
-            success: false
+            success: false,
         });
     }
 
-    const { data: user, error: fetchError } = await client
-        .from('users')
-        .select('first_name,last_name,email, password, role')
-        .eq('email', email)
-        .single();
+    try {
+        // Fetch user by email
+        const userQuery = `
+            SELECT first_name, last_name, email, password, role
+            FROM users
+            WHERE email = $1
+        `;
+        const { rows: users } = await pool.query(userQuery, [email]);
+        const user = users[0];
 
+        if (!user) {
+            return res.status(400).json({
+                message: "User does not exist",
+                success: false,
+            });
+        }
+        console.log("user from db", user);
+        // Compare password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({
+                message: "Invalid Credentials",
+                success: false,
+            });
+        }
 
-    if (fetchError || !user) {
-        return res.status(400).json({
-            message: "User does not exist",
-            success: false
+        // Generate JWT
+        const token_data = { email: user.email, role: user.role };
+        const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.cookie('jwttoken', token, {
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: 'Lax',
+            secure: false,
+        });
+
+        return res.status(200).json({
+            message: `Welcome Back ${user.first_name} ${user.last_name}`,
+            success: true,
+            role: user.role,
+        });
+    } catch (error) {
+        console.error('Error logging in:', error);
+        return res.status(500).json({
+            message: "Error logging in",
+            success: false,
         });
     }
-
-    // Compare the password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-        return res.status(400).json({
-            message: "Invalid Credentials",
-            success: false
-        });
-    }
-
-    // Check if the role matches
-    // if (role !== user.role) {
-    //     return res.status(400).json({
-    //         message: "Invalid Role",
-    //         success: false
-    //     });
-    // }
-
-    // Generate JWT token if login is successful
-    const token_data = { email: user.email, role: user.role }; // Simplified token data
-    const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.cookie('jwttoken', token, {
-        maxAge: 1 * 24 * 60 * 60 * 1000,  // 1 day
-        httpOnly: true,
-        sameSite: 'Lax',
-        secure: false,  // Use secure cookies in production
-    });
-
-    return res.status(200).json({
-        message: `Welcome Back ${user.first_name} ${user.last_name}`,
-        success: true,
-        role: user.role
-    });
 };
 
+// User Logout
 export const logout = async (req, res) => {
     try {
         res.clearCookie("jwttoken", {
             httpOnly: true,
             sameSite: 'Lax',
-            secure: false, // Use secure cookies in production
+            secure: false,
         });
 
         return res.status(200).json({
             message: "Logout successful",
-            success: true
+            success: true,
         });
-
-    }
-    catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: "error logging out",
-            success: false
+            message: "Error logging out",
+            success: false,
         });
     }
 };
