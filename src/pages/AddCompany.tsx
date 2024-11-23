@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,6 +8,17 @@ import { Button } from '@/components/ui/button';
 import { FaPlus } from "react-icons/fa";
 import { Dice1 } from 'lucide-react';
 import { IoIosClose } from "react-icons/io";
+import { useLocation } from 'react-router-dom';
+
+type CompanyData = {
+    company_id: string;
+    company_name: string;
+    description: string;
+    imageurl: string | null;
+    numberofemployees: number;
+    registered_at: Date;
+    website: string | null;
+}
 
 const MAX_FILE_SIZE = 1024 * 1024 * 5;
 const ACCEPTED_IMAGE_MIME_TYPES = [
@@ -30,17 +41,54 @@ const CompanySchema = z.object({
 type FormFields = z.infer<typeof CompanySchema>;
 
 export default function AddCompany() {
+    let location = useLocation();
+    const id = location.pathname?.split('/')[3] || null;
+    console.log("id is", id);
     const [isImageUploaded, setIsImageUploaded] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
+    const [companyData, setCompanyData] = useState<CompanyData | null>(null);
     const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm<FormFields>(
         {
+            defaultValues: {
+                company_name: "", // Initialize empty
+                description: "",
+                website: "",
+            },
             resolver: zodResolver(CompanySchema)
         }
     );
+
+    useEffect(() => {
+        if (id) {
+            const fetchData = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8000/getonecompany/${id}`);
+                    console.log(response.data);
+                    setCompanyData(response.data);
+                    reset({
+                        company_name: response.data.company_name,
+                        description: response.data.description,
+                        website: response.data.website,
+                    })
+                    setImagePreview(response.data.imageurl);
+                    if (companyData.imageurl) {
+                        setIsImageUploaded(true);
+                    }
+                }
+                catch (err) {
+                    console.log(err);
+                }
+            }
+            fetchData();
+        }
+    }, [])
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         const formData = new FormData();
         formData.append("company_name", data.company_name);
         formData.append("description", data.description);
+        if (id && companyData.imageurl) {
+            formData.append("imageUrl", companyData.imageurl);
+        }
         if (data.website) {
             formData.append("website", data.website);
         }
@@ -50,15 +98,32 @@ export default function AddCompany() {
             formData.append("profilePic", file);
         }
         try {
-            const response = await axios.post("http://localhost:8000/addcompany", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            console.log("Success:", response.data);
+            let response: any;
+            if (id) {
+                // console.log("iddd", id);
+                formData.append("id", id);
+                response = await axios.put("http://localhost:8000/updateonecompany", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                if (response.status === 201) {
+                }
+            }
+            else {
+                response = await axios.post("http://localhost:8000/addcompany", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                if (response.status === 201) {
+                }
+            }
+            // console.log("Success:", response.data);
             reset();
             setImagePreview(null);
             setIsImageUploaded(false);
+            setCompanyData(null);
         } catch (error) {
             console.error("Error uploading data:", error);
         }
@@ -96,7 +161,6 @@ export default function AddCompany() {
                             {...register("company_name")}
                             className='focus:outline-none active:outline-none border-[1px] rounded-md px-1 py-1 focus:border-customPurple font-Lato '
                             placeholder="Enter company name"
-
                         />
                         {errors.company_name && (
                             <div className="text-red-600 text-left">{errors.company_name.message}</div>
@@ -130,6 +194,7 @@ export default function AddCompany() {
                                 <IoIosClose onClick={() => {
                                     setImagePreview(null);
                                     setIsImageUploaded(false);
+                                    setCompanyData(prev => ({ ...prev, imageurl: null }));
                                 }
                                 } className='float-right cursor-pointer text-xl' />
                                 <img src={imagePreview} alt="Uploaded Preview" className='' />

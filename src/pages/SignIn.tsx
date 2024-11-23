@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx'
 import Navbar from "../components1/navbar.jsx";
+import { FaEye } from "react-icons/fa";
 
 const registerschema = z.object({
   email: z.string().email(),
@@ -16,6 +17,7 @@ const registerschema = z.object({
 type FormFields = z.infer<typeof registerschema>;
 export default function Signin() {
   const { authState, setAuthState } = useAuth();
+  const [togglePassword, settogglepassword] = useState(false)
   const Navigate = useNavigate();
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<FormFields>(
     {
@@ -67,7 +69,7 @@ export default function Signin() {
             </h1>
             <form
               action={"#"}
-              className="flex flex-col text-sm mt-6 w-full"
+              className="flex flex-col text-sm mt-6 w-full relative"
               onSubmit={handleSubmit(onSubmit)}
             >
               <label htmlFor="username" className="font-Roboto">
@@ -87,11 +89,12 @@ export default function Signin() {
                 password
               </label>
               <input
-                type="password"
+                type={!togglePassword ? 'password' : 'text'}
                 {...register("password")}
                 id="password"
                 className="focus:outline-none bg-transparent border-b border-blue-300"
               />
+              <FaEye className="absolute right-2 top-20 text-purple-950 cursor-pointer" onClick={() => settogglepassword(prev => !prev)} />
               {errors.password && (
                 <div className="text-red-600">{errors.password.message}</div>
               )}

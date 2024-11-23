@@ -37,7 +37,7 @@ const router = createBrowserRouter([
         element: <SpecificCompany />
       },
       {
-        path: "Add",
+        path: "Add/:id?",
         element: <AddCompany />
       },
 
