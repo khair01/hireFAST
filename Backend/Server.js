@@ -8,7 +8,7 @@ import companyRoute from './routes/Company/index.js';
 import fileuploadRoute from './routes/fileUploading/index.js' // Correct import
 import cookieParser from 'cookie-parser'
 import authMiddleware from './middleware/confirmuser.js';
-
+import jobsRoute from './routes/Jobs/index.js'
 const app = express();
 app.use(bodyParser.json());
 app.use(express.json());
@@ -27,12 +27,15 @@ app.use(cookieParser());
 app.use('/user', userRoute);
 app.use('/', fileuploadRoute);
 app.use('/', companyRoute);
+app.use('/', jobsRoute);
 
 app.get('/protected', authMiddleware, (req, res) => {
     // If we reach here, the token is valid, and the user is authenticated
     res.status(200).json({
         message: `Welcome back, ${req.user.email}`,
         role: req.user.role,
+        id: req.user.id,
+        email: req.user.email
     });
 });
 

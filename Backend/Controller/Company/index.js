@@ -5,7 +5,7 @@ export const addCompany = async (req, res) => {
     try {
         const { company_name, description, website } = req.body;
         const imageUrl = req.file?.location || req.body.imageUrl || null;
-        console.log(imageUrl);
+        // console.log(imageUrl);
 
         if (!company_name || !description) {
             return res.status(400).json({
@@ -28,8 +28,8 @@ export const addCompany = async (req, res) => {
         }
 
         // Log query for debugging
-        console.log("Query:", insertQuery);
-        console.log("Parameters:", queryParams);
+        // console.log("Query:", insertQuery);
+        // console.log("Parameters:", queryParams);
 
         // Execute query
         await pool.query(insertQuery, queryParams);
@@ -74,7 +74,7 @@ export const updateOneCompany = async (req, res) => {
     try {
         const { company_name, description, website, id } = req.body;
         const imageUrl = req.file?.location || req.body.imageUrl || null;
-        console.log(req.body);
+        // console.log(req.body);
 
         if (!company_name || !description) {
             return res.status(400).json({
@@ -94,7 +94,7 @@ export const updateOneCompany = async (req, res) => {
             })
         }
 
-        let updateQuery = 'update company set company_name=$1,description=$2,website=$3,imageurl=$4 where company_id=$5 '
+        let updateQuery = 'update company set company_name=$1,description=$2,website=$3,imageurl=$4 where company_id=$5  RETURNING *; '
         let updateParams = [company_name, description, website, imageUrl, id]
         const result = await pool.query(updateQuery, updateParams);
         if (result.rowCount === 0) {
@@ -103,9 +103,10 @@ export const updateOneCompany = async (req, res) => {
                 success: false
             })
         }
-        console.log("rows updated successfully", result.rowCount);
+        // console.log("rows updated successfully", result.rowCount);
         return res.status(201).json({
             message: "Company updated successfully",
+            data: result.rows[0]
         });
     } catch (e) {
         console.error("Error inserting company:", e);
@@ -114,4 +115,45 @@ export const updateOneCompany = async (req, res) => {
             error: e.message,
         });
     }
+}
+
+export const getcompanybyuserId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(401).json({
+                message: "id is required",
+                success: false,
+            })
+        }
+        // if (role && role === 'student') {
+        //     return res.status(403).json({
+        //         message: "only employers can add company",
+        //         success: false,
+        //     })
+        // }
+        let findCompany = 'Select * from company where employer_id=$1';
+
+        const { rows } = await pool.query(findCompany, [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: 'employer has no Company registered',
+                success: false
+            })
+        }
+        // console.log(rows);
+        return res.status(200).json({
+            success: true,
+            data: rows[0]
+        })
+
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'internal server error'
+        })
+    }
+
+
 }

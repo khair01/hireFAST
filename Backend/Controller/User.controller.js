@@ -69,7 +69,7 @@ export const login = async (req, res) => {
     try {
         // Fetch user by email
         const userQuery = `
-            SELECT first_name, last_name, email, password, role
+            SELECT first_name, last_name, email, password, role,id
             FROM users
             WHERE email = $1
         `;
@@ -93,7 +93,7 @@ export const login = async (req, res) => {
         }
 
         // Generate JWT
-        const token_data = { email: user.email, role: user.role };
+        const token_data = { email: user.email, role: user.role, id: user.id };
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.cookie('jwttoken', token, {
@@ -107,6 +107,7 @@ export const login = async (req, res) => {
             message: `Welcome Back ${user.first_name} ${user.last_name}`,
             success: true,
             role: user.role,
+            id: user.id
         });
     } catch (error) {
         console.error('Error logging in:', error);
