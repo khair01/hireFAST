@@ -43,12 +43,12 @@ export default function Navbar() {
             <div>
                 {!authState.isAuthorized ?
                     (<>
-                        <Link to="signin"
+                        <Link to="/signin"
                             className={`mx-6 font-lato ${buttonTextColor}`}
                         >
                             Sign in
                         </Link>
-                        <Link to="signup"
+                        <Link to="/signup"
                             className={`px-4 py-2 rounded-full hover:drop-shadow-l font-lato ${signUpButtonColor}`}
                         >
                             Sign up

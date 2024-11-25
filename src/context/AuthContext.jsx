@@ -7,6 +7,8 @@ export const AuthProvider = ({ children }) => {
     const [authState, setAuthState] = useState({
         isAuthorized: false,
         role: null,
+        id: null,
+        email: null,
         loading: true
     });
     useEffect(() => {
@@ -15,10 +17,12 @@ export const AuthProvider = ({ children }) => {
                 const res = await axios.get("http://localhost:8000/protected", {
                     withCredentials: true,
                 });
-                console.log(res.data); // Handle success
+                console.log("data from backend", res.data); // Handle success
                 setAuthState(prev => ({
                     ...prev,
                     role: res.data.role,
+                    id: res.data.id,
+                    email: res.data.email,
                     isAuthorized: true,
                     loading: false
                 }));

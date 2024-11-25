@@ -9,6 +9,8 @@ import { FaPlus } from "react-icons/fa";
 import { Dice1 } from 'lucide-react';
 import { IoIosClose } from "react-icons/io";
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx'
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 type CompanyData = {
     company_id: string;
@@ -41,9 +43,34 @@ const CompanySchema = z.object({
 type FormFields = z.infer<typeof CompanySchema>;
 
 export default function AddCompany() {
+    const { authState, setAuthState } = useAuth();
     let location = useLocation();
-    const id = location.pathname?.split('/')[3] || null;
-    console.log("id is", id);
+    const navigate = useNavigate();
+    const companyId = location.pathname?.split('/')[3] || null;
+    console.log("companyId is", companyId);
+    useEffect(() => {
+        if (authState.role !== 'admin' && authState.role !== 'recruiter') {
+            navigate('/');
+        }
+
+    }, [authState]);
+    useEffect(() => {
+        if (!authState.loading && !companyId && authState.id) {
+            const fetchData = async () => {
+                try {
+                    console.log("authstateid,", authState.id);
+                    const res = await axios.get(`http://localhost:8000/getcompanybyuserid/${authState.id}`)
+                    console.log("res", res);
+                    if (res.data.success) {
+                        navigate(`/company/${res.data.data.company_id}`)
+                    }
+                } catch (err) {
+                    console.log('error finding company by user id ', err);
+                }
+            };
+            fetchData();
+        }
+    }, [authState.loading, authState.id]);
     const [isImageUploaded, setIsImageUploaded] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [companyData, setCompanyData] = useState<CompanyData | null>(null);
@@ -59,10 +86,10 @@ export default function AddCompany() {
     );
 
     useEffect(() => {
-        if (id) {
+        if (companyId) {
             const fetchData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8000/getonecompany/${id}`);
+                    const response = await axios.get(`http://localhost:8000/getonecompany/${companyId}`);
                     console.log(response.data);
                     setCompanyData(response.data);
                     reset({
@@ -86,7 +113,7 @@ export default function AddCompany() {
         const formData = new FormData();
         formData.append("company_name", data.company_name);
         formData.append("description", data.description);
-        if (id && companyData.imageurl) {
+        if (companyId && companyData.imageurl) {
             formData.append("imageUrl", companyData.imageurl);
         }
         if (data.website) {
@@ -99,9 +126,9 @@ export default function AddCompany() {
         }
         try {
             let response: any;
-            if (id) {
-                // console.log("iddd", id);
-                formData.append("id", id);
+            if (companyId) {
+                // console.log("companyIddd", companyId);
+                formData.append("id", companyId);
                 response = await axios.put("http://localhost:8000/updateonecompany", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
@@ -121,6 +148,7 @@ export default function AddCompany() {
             }
             // console.log("Success:", response.data);
             reset();
+            navigate(`/company/${response.data.data.company_id}`)
             setImagePreview(null);
             setIsImageUploaded(false);
             setCompanyData(null);

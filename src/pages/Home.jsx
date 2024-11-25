@@ -8,8 +8,14 @@ import Navbar from "../components1/navbar.jsx";
 
 export default function Home() {
   const { authState } = useAuth();
+  console.log('authState from home', authState);
   const [selectedFeature, setSelectedFeature] = useState("AboutUs");
-
+  const [userType, setUserType] = useState('');
+  // console.log("authstate from home", authState);
+  useEffect(() => {
+    setUserType(authState.role === 'recruiter' || authState.role === 'admin' ? 'employer' : 'student');
+  }, [authState]);
+  console.log("userType from home", userType);
   const featureText = {
     QuickJobSearch:
       "Easily search for companies and jobs using filters like company name, job title, and location. Find relevant opportunities without the hassle.",
@@ -36,9 +42,9 @@ export default function Home() {
             future.
           </p>
         </div>
-        <Link to="/applynow">
+        <Link to={userType === 'employer' ? '/company/Add' : 'applynow'}>
           <button className="bg-customPurple text-white px-8 py-4 rounded-full hover:drop-shadow-l font-Lato mx-10 mt-6">
-            Apply Now
+            {userType === 'employer' ? 'Post Job' : "Apply Now"}
           </button>
         </Link>
       </section>

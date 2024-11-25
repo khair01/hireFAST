@@ -25,20 +25,21 @@ const router = createBrowserRouter([
   },
   {
     path: "/Company",
-
     element:
-      <ProtectedRoute role={["admin", "recruiter"]}>
-        <Company />,
-      </ProtectedRoute>
-    ,
+      <Company />,
     children: [
       {
         path: ":id",
         element: <SpecificCompany />
       },
       {
+
         path: "Add/:id?",
-        element: <AddCompany />
+
+        element:
+          <ProtectedRoute role={["admin", "recruiter"]}>
+            <AddCompany />
+          </ProtectedRoute>
       },
 
     ],

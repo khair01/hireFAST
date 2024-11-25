@@ -42,6 +42,7 @@ export default function Signin() {
 
       setAuthState({
         role: res.data.role,
+        id: res.data.id,
         isAuthorized: true,
         loading: false
       })

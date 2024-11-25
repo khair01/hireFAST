@@ -8,7 +8,6 @@ const ApplyJobs = () => {
       <div className="py-30 px-10">
         <Navbar />
       </div>
-
       <HeroSection />
     </div>
   );
