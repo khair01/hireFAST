@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import axios from 'axios';
 import { useNavigate } from "react-router";
 import { useAuth } from '../context/AuthContext.jsx'
-import Jobs from '../components/Jobs.tsx'
+import Jobs from '../components/PostJobs.tsx'
 export default function SpecificCompany() {
     const [companyData, setCompanyData] = useState({});
     const { authState } = useAuth();
@@ -28,7 +28,7 @@ export default function SpecificCompany() {
             }
         }
         fetchData();
-    }, [id])
+    }, [authState, id])
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -41,7 +41,7 @@ export default function SpecificCompany() {
             }
         }
         fetchData();
-    }, [])
+    }, [authState, id])
     const handleupdateClick = () => {
         navigate(`/Company/Add/${idd}`);
     }
@@ -83,7 +83,7 @@ export default function SpecificCompany() {
                         }
                     </div>
                     <h6 className='text-center mt-4 font-lato text-gray-600 text-sm'>Company has no recent Openings</h6>
-                    {jobToggle && <Jobs setjobsToggle={setjobsToggle} />}
+                    {jobToggle && <Jobs setjobsToggle={setjobsToggle} company_id={id} />}
                 </div>
 
             </section>

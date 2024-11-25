@@ -56,7 +56,8 @@ export default function Navbar() {
                     </>) :
                     <Signout signUpButtonColor={signUpButtonColor} />
                 }
+
             </div>
-        </nav>
+        </nav >
     )
 }

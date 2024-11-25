@@ -17,7 +17,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Company from "./pages/Company.tsx";
 import SpecificCompany from "./pages/SpecificCompany.jsx";
 import AddCompany from "./pages/AddCompany.tsx";
-
+import { Toaster } from "@/components/ui/toaster"
 const router = createBrowserRouter([
   {
     path: "/",
@@ -91,7 +91,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider >
+
       <RouterProvider router={router} />
+      <Toaster />
     </AuthProvider>
   </StrictMode>
 );

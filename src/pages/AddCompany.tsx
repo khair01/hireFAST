@@ -11,7 +11,7 @@ import { IoIosClose } from "react-icons/io";
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx'
 import { Link, Navigate, useNavigate } from "react-router-dom";
-
+import { useToast } from "@/hooks/use-toast"
 type CompanyData = {
     company_id: string;
     company_name: string;
@@ -43,6 +43,7 @@ const CompanySchema = z.object({
 type FormFields = z.infer<typeof CompanySchema>;
 
 export default function AddCompany() {
+    const { toast } = useToast();
     const { authState, setAuthState } = useAuth();
     let location = useLocation();
     const navigate = useNavigate();
@@ -66,6 +67,11 @@ export default function AddCompany() {
                     }
                 } catch (err) {
                     console.log('error finding company by user id ', err);
+                    toast({
+                        title: "Oops!",
+                        description: 'Error adding company',
+                        variant: "destructive"
+                    })
                 }
             };
             fetchData();
