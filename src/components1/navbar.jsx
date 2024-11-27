@@ -38,9 +38,12 @@ export default function Navbar() {
     <nav
       className={`${navbarColor} py-4 px-6 flex justify-between items-center fixed top-0 left-0 w-full z-10 transition-colors duration-200`}
     >
-      <div className={`text-3xl font-bold font-Montserrat ${textColor}`}>
+      <Link
+        to="/"
+        className={`text-3xl font-bold font-Montserrat ${textColor}`}
+      >
         hireFAST
-      </div>
+      </Link>
       <div>
         {!authState.isAuthorized ? (
           <>
