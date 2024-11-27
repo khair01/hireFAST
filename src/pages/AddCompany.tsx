@@ -67,11 +67,6 @@ export default function AddCompany() {
                     }
                 } catch (err) {
                     console.log('error finding company by user id ', err);
-                    toast({
-                        title: "Oops!",
-                        description: 'Error adding company',
-                        variant: "destructive"
-                    })
                 }
             };
             fetchData();
@@ -99,11 +94,11 @@ export default function AddCompany() {
                     console.log(response.data);
                     setCompanyData(response.data);
                     reset({
-                        company_name: response.data.company_name,
-                        description: response.data.description,
-                        website: response.data.website,
+                        company_name: response.data.company.company_name,
+                        description: response.data.company.description,
+                        website: response.data.company.website,
                     })
-                    setImagePreview(response.data.imageurl);
+                    setImagePreview(response.data.company.imageurl);
                     if (companyData.imageurl) {
                         setIsImageUploaded(true);
                     }
@@ -119,6 +114,7 @@ export default function AddCompany() {
         const formData = new FormData();
         formData.append("company_name", data.company_name);
         formData.append("description", data.description);
+        formData.append("employer_id", authState.id);
         if (companyId && companyData.imageurl) {
             formData.append("imageUrl", companyData.imageurl);
         }
@@ -140,8 +136,6 @@ export default function AddCompany() {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                if (response.status === 201) {
-                }
             }
             else {
                 response = await axios.post("http://localhost:8000/addcompany", formData, {
@@ -149,16 +143,22 @@ export default function AddCompany() {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                if (response.status === 201) {
-                }
+
             }
             // console.log("Success:", response.data);
-            reset();
-            navigate(`/company/${response.data.data.company_id}`)
-            setImagePreview(null);
-            setIsImageUploaded(false);
-            setCompanyData(null);
+            if (response.status === 201) {
+                reset();
+                navigate(`/company/${response.data.data.company_id}`)
+                setImagePreview(null);
+                setIsImageUploaded(false);
+                setCompanyData(null);
+            }
         } catch (error) {
+            toast({
+                title: "Oops!",
+                description: 'Error adding company',
+                variant: "destructive"
+            })
             console.error("Error uploading data:", error);
         }
     };

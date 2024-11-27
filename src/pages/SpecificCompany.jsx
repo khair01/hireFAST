@@ -8,8 +8,10 @@ import axios from 'axios';
 import { useNavigate } from "react-router";
 import { useAuth } from '../context/AuthContext.jsx'
 import Jobs from '../components/PostJobs.tsx'
+import JobCard from '../components1/jobcard.jsx';
 export default function SpecificCompany() {
     const [companyData, setCompanyData] = useState({});
+    const [jobData, setJobData] = useState([{}]);
     const { authState } = useAuth();
     const { id } = useParams();
     const [hasEmployerOpened, setHasEmployerOpened] = useState(false);
@@ -21,35 +23,58 @@ export default function SpecificCompany() {
             try {
                 const res = await axios.get(`http://localhost:8000/getonecompany/${id}`);
                 console.log("found company:", res.data);
-                setCompanyData(res.data);
-                setHasEmployerOpened(authState.id === res.data.employer_id);
+                setCompanyData(res.data.company);
+                console.log(res.data.jobs);
+                setJobData(res.data.jobs);
+                setHasEmployerOpened(authState.id === res.data.company.employer_id);
             } catch (error) {
                 console.error("Error fetching company data:", error);
             }
         }
         fetchData();
     }, [authState, id])
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await axios.get(`http://localhost:8000/getalljobs/${id}`);
-                console.log("jobs posted:", res.data);
-                // setCompanyData(res.data);
 
-            } catch (error) {
-                console.error("Error fetching jobs:", error);
-            }
+    useEffect(() => {
+        if (jobToggle) {
+            document.body.style.overflow = 'hidden'; // Disable scrolling
+        } else {
+            document.body.style.overflow = 'auto'; // Enable scrolling
         }
-        fetchData();
-    }, [authState, id])
+        return () => {
+            document.body.style.overflow = 'auto'; // Ensure it's reset when the component is unmounted
+        };
+    }, [jobToggle]);
+
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const res = await axios.get(`http://localhost:8000/getalljobs/${id}`);
+    //             console.log("jobs posted:", res.data);
+    //             // setCompanyData(res.data);
+
+    //         } catch (error) {
+    //             console.error("Error fetching jobs:", error);
+    //         }
+    //     }
+    //     fetchData();
+    // }, [authState, id])
     const handleupdateClick = () => {
-        navigate(`/Company/Add/${idd}`);
+        navigate(`/Company/Add/${id}`);
     }
 
     const handlejobsClick = () => {
         console.log("toggling jobs");
         setjobsToggle(prev => !prev);
     }
+    if (companyData.length === 0 && jobData.length === 0) {
+        return (
+            <>
+                loading...
+            </>
+        )
+    }
+
     return (
         <>
             <section className='flex mt-[68px] justify-between w-full bg-gradient-to-r from-blue-100 via-purple-100 to-blue-50 '>
@@ -62,7 +87,7 @@ export default function SpecificCompany() {
                     </div>
                     <div className='flex flex-col'>
                         <h1 className='font-bold text-2xl mt-14 ml-4'>{companyData.company_name}</h1>
-                        <p className='text-gray-400 ml-4'>numberof employees: {companyData.numberofemployees}</p>
+                        <p className='text-gray-400 ml-4'>number of employees: {1}</p>
                     </div>
                 </div>
                 {hasEmployerOpened && <Button className="bg-customPurple mt-16 mr-8" onClick={handleupdateClick}><FaPlus />Update Profile</Button>
@@ -82,8 +107,34 @@ export default function SpecificCompany() {
                         {hasEmployerOpened && <Button className=" bg-customPurple relative bottom- " onClick={() => handlejobsClick()}><FaPlus />Post Job</Button>
                         }
                     </div>
-                    <h6 className='text-center mt-4 font-lato text-gray-600 text-sm'>Company has no recent Openings</h6>
-                    {jobToggle && <Jobs setjobsToggle={setjobsToggle} company_id={id} />}
+                    {jobData && jobData.length === 0 ? (
+                        <h6 className='text-center mt-4 font-lato text-gray-600 text-sm'>
+                            Company has no recent Openings
+                        </h6>
+                    ) : (
+                        jobData.length > 0 && jobData.map((job) => (
+                            <div key={job.job_id} className='flex flex-col my-2'>
+                                <JobCard
+                                    applicant_count={job.applicant_count}
+                                    cvs={job.cvs}
+                                    job_id={job.job_id}
+                                    title={job.title}
+                                    company_id={companyData.company_id}
+                                    company={companyData.company_name}
+                                    type={job.jobtype}
+                                    description={job.description}
+                                    requirement={job.requirement}
+                                    posted_date={job.posted_date}
+                                    closing_date={job.closing_date}
+                                    status={job.status}
+                                    hasEmployerOpened={hasEmployerOpened}
+                                    setJobData={setJobData}
+                                />
+                            </div>
+                        ))
+                    )}
+                    {jobToggle && <Jobs setjobsToggle={setjobsToggle} company_id={id} setJobData={setJobData} />}
+
                 </div>
 
             </section>

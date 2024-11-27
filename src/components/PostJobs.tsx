@@ -27,13 +27,12 @@ const JobSchema = z.object({
     status: z.enum(["open", "closed"], { message: "Status must be 'open' or 'closed'" }),
 });
 
-const Jobs: React.FC = ({ setjobsToggle, company_id }: any) => {
+const Jobs: React.FC = ({ setjobsToggle, company_id, setJobData }: any) => {
     const { toast } = useToast()
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<JobData>({
         resolver: zodResolver(JobSchema),
     });
     const navigate = useNavigate();
-
     const onSubmit: SubmitHandler<JobData> = async (data) => {
         try {
             const res = await axios.post('http://localhost:8000/postjob', {
@@ -46,6 +45,7 @@ const Jobs: React.FC = ({ setjobsToggle, company_id }: any) => {
                 status: data.status
             })
             if (res.data.success) {
+                setJobData((prev: any) => [...prev, data]);
                 toast({
                     title: "yess!",
                     description: res.data.message
@@ -63,7 +63,7 @@ const Jobs: React.FC = ({ setjobsToggle, company_id }: any) => {
 
     return (
         <div
-            className="h-10/12 w-10/12 max-h-screen max-w-screen overflow-y-scroll scrollbar-hide overflow-hidden border-2 rounded-lg z-10 bg-gray-100 border-customPurple absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-6"
+            className="h-10/12 w-10/12 max-h-screen max-w-screen overflow-y-scroll scrollbar-hide overflow-hidden border-2 rounded-lg z-10 bg-gray-100 border-customPurple fixed top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-6"
         >
             <Button className='bg-customPurple px-6 ' onClick={() => { setjobsToggle(prev => !prev) }}>Back</Button>
             <h1 className="text-2xl font-bold text-center mb-6 font-Lato">Create Job</h1>
@@ -133,7 +133,6 @@ const Jobs: React.FC = ({ setjobsToggle, company_id }: any) => {
                     >
                         <option value="open">Open</option>
                         <option value="closed">Closed</option>
-                        <option value="draft">Draft</option>
                     </select>
                     {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
                 </div>
