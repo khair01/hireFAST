@@ -66,7 +66,7 @@ export default function JobCard({
 
   const handlejobDelete = async () => {
     try {
-      console.log('job_id', job_id);
+
       const res = await axios.delete(`http://localhost:8000/deletejob/${job_id}`);
       if (res.data.success) {
         setJobData((prev) => {
@@ -120,6 +120,7 @@ export default function JobCard({
             description: 'CV UPLOADED Successfully',
           })
           setLoading(false);
+          setAppliedAlready(true);
         }
       } catch (e) {
         console.log("error uploading cv");

@@ -1,14 +1,13 @@
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FaGoogle } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa";
-import React from "react";
-import { Link } from "react-router-dom";
+import { FaGoogle, FaGithub, FaEye } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components1/navbar.jsx";
+import { useToast } from "@/hooks/use-toast.js";
 
-// firstName, lastName, email, phone_number, password, role
-
+// Validation schema
 const registerSchema = z.object({
   firstName: z
     .string()
@@ -19,43 +18,34 @@ const registerSchema = z.object({
     .min(4, "Last name should be at least 4 characters long")
     .max(40, "Last name should be no longer than 40 characters"),
   email: z.string().email("Invalid email address"),
-  phone_number: z.string().length(11, "Phone number must be exactly 11 digits"),
+  phone_number: z
+    .string()
+    .length(11, "Phone number must be exactly 11 digits"),
   password: z
     .string()
     .min(5, "Password should be at least 5 characters long")
     .max(40, "Password should be no longer than 40 characters"),
   role: z.enum(["student", "recruiter"], {
-    errorMap: (issue, ctx) => ({
-      message: "role should be either student or recruiter",
+    errorMap: () => ({
+      message: "Role should be either student or recruiter",
     }),
   }),
 });
 
 const formdata = [
-  {
-    name: "firstName",
-    type: "text",
-  },
-  {
-    name: "lastName",
-    type: "text",
-  },
-  {
-    name: "email",
-    type: "text",
-  },
-  {
-    name: "phone_number",
-    type: "text",
-  },
-  {
-    name: "password",
-    type: "password",
-  },
+  { name: "firstName", label: "First Name", type: "text" },
+  { name: "lastName", label: "Last Name", type: "text" },
+  { name: "email", label: "Email", type: "text" },
+  { name: "phone_number", label: "Phone Number", type: "text" },
+  { name: "password", label: "Password", type: "password" },
 ];
+
 type FormFields = z.infer<typeof registerSchema>;
 
-export default function Signup({ children }: { children?: React.ReactNode }) {
+export default function Signup() {
+  const [togglePassword, setTogglePassword] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -68,118 +58,124 @@ export default function Signup({ children }: { children?: React.ReactNode }) {
     const res = await fetch("http://localhost:8000/user/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone_number: data.phone_number,
-        password: data.password,
-        role: data.role,
-      }),
+      body: JSON.stringify(data),
     });
 
     if (!res.ok) {
-      console.log("Registration failed");
+      toast({
+        title: "Error",
+        description: "Registration failed. Please try again.",
+        variant: "destructive",
+      });
     } else {
-      console.log("Registered successfully");
-      // Optionally, redirect or log in the user here
+      toast({
+        title: "Success",
+        description: "Registered successfully!",
+      });
+      navigate("/signin");
     }
   };
 
   return (
     <>
       <Navbar />
-      <div className="flex justify-center items-center min-h-screen bg-customWhite">
-        <div className="bg-white border-customPurple w-11/12 md:w-2/5 my-20 py-6 px-8 flex flex-col items-center max-w-lg border-2 border- rounded-md shadow-md">
-          <h1 className="pt-8 font-semibold text-3xl font-Montserrat  text-customPurple ">
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="bg-white border w-full max-w-lg p-6 rounded-lg shadow-md mt-20">
+          <h1 className="text-2xl font-bold text-purple-700 mb-4 text-center">
             Sign Up
           </h1>
           <form
-            action="#"
-            className="flex flex-col text-sm mt-6 w-full"
+            className="space-y-4"
             onSubmit={handleSubmit(onSubmit)}
           >
-            {formdata.map((element, index) => {
-              return (
-                <React.Fragment key={index}>
-                  <label
-                    htmlFor={element.name}
-                    className=" mt-1 font-Roboto font-bold"
-                  >
-                    {element.name.toLowerCase()}
-                  </label>
+            {formdata.map(({ name, label, type }, index) => (
+              <div key={index}>
+                <label htmlFor={name} className="block font-medium">
+                  {label}
+                </label>
+                <div className="relative">
                   <input
-                    type={element.type}
-                    id={element.name}
-                    autoComplete="off"
-                    className="focus:outline-none bg-transparent border-b border-customPurple"
-                    {...register(element.name as keyof FormFields)}
+                    type={
+                      type === "password"
+                        ? togglePassword
+                          ? "text"
+                          : "password"
+                        : "text"
+                    }
+                    id={name}
+                    {...register(name as keyof FormFields)}
+                    className="w-full border rounded-md p-2 mt-1 active:outline-none focus:outline-none focus:ring ring-1 focus:ring-purple-800"
                   />
-                  {errors[element.name as keyof FormFields] && (
-                    <div className="text-red-600">
-                      {errors[element.name as keyof FormFields]?.message}
-                    </div>
+                  {type === "password" && (
+                    <FaEye
+                      className="absolute right-2 top-[19PX] text-gray-500 cursor-pointer"
+                      onClick={() =>
+                        setTogglePassword((prev) => !prev)
+                      }
+                    />
                   )}
-                </React.Fragment>
-              );
-            })}
-            <label htmlFor="role" className="mt-2 font-Roboto">
-              Choose a Role
-            </label>
+                </div>
+                {errors[name as keyof FormFields] && (
+                  <p className="text-red-500 text-sm">
+                    {errors[name as keyof FormFields]?.message}
+                  </p>
+                )}
+              </div>
+            ))}
 
-            <select
-              id="role"
-              className="border-[1px] border-purple-950 active:outline-none font-Roboto "
-              defaultValue=""
-              {...register("role")}
-            >
-              <option value="" disabled>
-                Select Option
-              </option>
-              <option value="student">Student</option>
-              <option value="recruiter">Recruiter</option>
-            </select>
+            <div>
+              <label htmlFor="role" className="block font-medium">
+                Role
+              </label>
+              <select
+                id="role"
+                defaultValue=""
+                {...register("role")}
+                className="w-full border rounded-md p-2 mt-1 focus:ring focus:ring-purple-300"
+              >
+                <option value="" disabled>
+                  Select your role
+                </option>
+                <option value="student">Student</option>
+                <option value="recruiter">Recruiter</option>
+              </select>
+              {errors.role && (
+                <p className="text-red-500 text-sm">
+                  {errors.role.message}
+                </p>
+              )}
+            </div>
 
             <Link
-              to={"/SignIn"}
-              className="text-xs pt-1 text-gray-400 underline underline-offset-2 opacity-80 hover:opacity-100 mt-1 md:text-sm w-full"
+              to="/signin"
+              className="text-sm text-gray-500 underline hover:text-gray-700"
             >
-              Already have an account?
+              Already have an account? Sign in
             </Link>
 
             <button
-              className="btn-primary font-Lato rounded-full"
               type="submit"
+              className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 disabled:bg-purple-300"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Sign Up"}
             </button>
           </form>
 
-          <div className="my-4 flex items-center w-full">
-            <span className="flex-grow h-px bg-gray-500 opacity-25"></span>
-            <p className="mx-4">OR</p>
-            <span className="flex-grow h-px bg-gray-500 opacity-25"></span>
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t"></div>
+            <span className="mx-2 text-gray-500">OR</span>
+            <div className="flex-grow border-t"></div>
           </div>
 
-          <button
-            className="flex bg-white border-[1px] border-black py-2 mb-4 w-7/12 md:w-8/12 mx-auto hover:bg-zinc-800"
-            onClick={async (e) => {
-              e.preventDefault();
-            }}
-          >
-            <FaGithub className="mt-1 ml-1" />
-            <h3 className="flex-grow font-Lato">Continue with GitHub</h3>
+          <button className="w-full flex items-center justify-center border rounded-md py-2 mb-2 hover:bg-gray-100">
+            <FaGithub className="mr-2" />
+            Continue with GitHub
           </button>
 
-          <button
-            className="flex bg-blue-500 text-black py-2 mx-auto w-7/12 md:w-8/12 hover:bg-gray-500"
-            onClick={async (e) => {
-              e.preventDefault();
-            }}
-          >
-            <FaGoogle className="mt-1 ml-1" />
-            <h3 className="flex-grow font-Lato">Continue with Google</h3>
+          <button className="w-full flex items-center justify-center bg-blue-500 text-white rounded-md py-2 hover:bg-blue-600">
+            <FaGoogle className="mr-2" />
+            Continue with Google
           </button>
         </div>
       </div>

@@ -2,7 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { useAuth } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 export default function Signout({ signUpButtonColor }) {
+    const navigate = useNavigate();
     const { setAuthState } = useAuth();
     const handleSignOut = async () => {
         console.log('hello');
@@ -14,7 +16,7 @@ export default function Signout({ signUpButtonColor }) {
                 isAuthorized: false,
                 loading: false
             })
-
+            navigate('/');
         }
         catch (err) {
             console.log("error signing out");

@@ -64,13 +64,13 @@ export default function Signin() {
           </h1>
         </div>
         <div className="flex justify-center items-center w-full md:w-auto min-h-screen bg-customWhite">
-          <div className="bg-white border-purple-950 w-full md:w-auto max-w-xs py-6 px-8 flex flex-col items-center border-2 rounded-md shadow-md mx-20 -my-20 md:my-0">
-            <h1 className="text-purple-800 pt-14 font-Montserrat text-3xl font-bold">
+          <div className="bg-white w-full md:w-auto max-w-xs py-6 px-8 flex flex-col items-center border-2 rounded-md shadow-md mx-20 -my-20 md:my-0">
+            <h1 className="text-3xl font-bold text-purple-700 mb-4 text-center">
               Sign In
             </h1>
             <form
               action={"#"}
-              className="flex flex-col text-sm mt-6 w-full relative"
+              className="flex flex-col text-sm mt-6 w-full relative space-y-2"
               onSubmit={handleSubmit(onSubmit)}
             >
               <label htmlFor="username" className="font-Roboto">
@@ -81,7 +81,7 @@ export default function Signin() {
                 id="username"
                 {...register("email")}
                 autoComplete="off"
-                className="focus:outline-none active:outline-none bg-transparent border-b border-blue-300 mb-4"
+                className="focus:outline-none active:outline-none ring-1 focus:ring-purple-600 py-1 px-1"
               />
               {errors.email && (
                 <div className="text-red-600">{errors.email.message}</div>
@@ -93,9 +93,9 @@ export default function Signin() {
                 type={!togglePassword ? 'password' : 'text'}
                 {...register("password")}
                 id="password"
-                className="focus:outline-none bg-transparent border-b border-blue-300"
+                className="focus:outline-none active:outline-none ring-1 focus:ring-purple-600 py-1 px-1"
               />
-              <FaEye className="absolute right-2 top-20 text-purple-950 cursor-pointer" onClick={() => settogglepassword(prev => !prev)} />
+              <FaEye className="absolute right-2 top-[93px] text-purple-950 cursor-pointer" onClick={() => settogglepassword(prev => !prev)} />
               {errors.password && (
                 <div className="text-red-600">{errors.password.message}</div>
               )}
