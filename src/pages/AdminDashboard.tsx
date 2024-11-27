@@ -87,21 +87,19 @@ export default function AdminDashboard() {
 
       <div className="flex justify-start px-[180px] gap-4 mb-6">
         <button
-          className={`px-6 py-2 rounded ${
-            view === "students"
+          className={`px-6 py-2 rounded ${view === "students"
               ? "bg-customPurple text-customWhite"
               : "bg-gray-200 text-customPurple"
-          }`}
+            }`}
           onClick={() => setView("students")}
         >
           Students
         </button>
         <button
-          className={`px-6 py-2 rounded ${
-            view === "companies"
+          className={`px-6 py-2 rounded ${view === "companies"
               ? "bg-customPurple text-customWhite"
               : "bg-gray-200 text-customPurple"
-          }`}
+            }`}
           onClick={() => setView("companies")}
         >
           Companies

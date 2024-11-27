@@ -82,7 +82,6 @@ export const getOneCompany = async (req, res) => {
             return res.status(404).json({ message: "Company not found" });
         }
 
-
         let CompanyData = {
             company_id: rows[0].company_id,
             employer_id: rows[0].employer_id,
@@ -100,8 +99,8 @@ export const getOneCompany = async (req, res) => {
                         SELECT 
                             COUNT(*) AS applicant_count,
                             ARRAY_AGG(cv) AS cvs
-                        FROM jobapplications
-                        WHERE job_id = $1;
+                            FROM jobapplications
+                            WHERE job_id = $1;
                     `;
                 const jobParams = [row.job_id];
                 const { rows: applicantsRows } = await pool.query(jobApplicantsQuery, jobParams);
@@ -217,6 +216,4 @@ export const getcompanybyuserId = async (req, res) => {
             message: 'internal server error'
         })
     }
-
-
 }
