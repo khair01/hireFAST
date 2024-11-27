@@ -7,7 +7,7 @@ import Signup from "./pages/Signup.tsx";
 import ApplyJobs from "./pages/ApplyJobs.jsx";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
-import AdminDashboard from "./pages/AdminDashboard.tsx";
+// import AdminDashboard from "./pages/AdminDashboard.tsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ProtectedRoute } from "./Routes/ProtectedRoutes.tsx";
@@ -49,13 +49,13 @@ const router = createBrowserRouter([
     element:
       <Dashboard />,
     children: [
-      {
-        path: "admin",
-        element:
-          <ProtectedRoute role="admin">
-            <AdminDashboard />
-          </ProtectedRoute>
-      },
+      // {
+      //   path: "admin",
+      //   element:
+      //     <ProtectedRoute role="admin">
+      //       <AdminDashboard />
+      //     </ProtectedRoute>
+      // },
       {
         path: "student",
         element:

@@ -16,7 +16,9 @@ import { useToast } from "@/hooks/use-toast"
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
+import Jobs from "../components/PostJobs.tsx";
 export default function JobCard({
+  setjobsToggle,
   students,
   applicant_count,
   cvs,
@@ -64,6 +66,7 @@ export default function JobCard({
 
   const handlejobDelete = async () => {
     try {
+      console.log('job_id', job_id);
       const res = await axios.delete(`http://localhost:8000/deletejob/${job_id}`);
       if (res.data.success) {
         setJobData((prev) => {
@@ -274,6 +277,23 @@ export default function JobCard({
           </div>
         </>)
       }
+      {updateJob && (
+        <Jobs
+          updateJob={updateJob}
+          setJobData={setJobData}
+          company_id={company_id}
+          job_id={job_id}
+          title={title}
+          company={company}
+          type={type}
+          salary={salary}
+          description={description}
+          requirement={requirement}
+          status={status}
+          closingDate={closing_date}
+          onClose={() => setUpdateJob(false)}
+        />
+      )}
     </>
   )
 }

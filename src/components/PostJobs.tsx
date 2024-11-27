@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,7 +6,6 @@ import axios from 'axios';
 import { Button } from './ui/button';
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast"
-
 type JobData = {
     job_id: string | null;
     company_id: string | null;
@@ -14,7 +13,7 @@ type JobData = {
     description: string;
     requirement: string
     jobtype: string;
-    closing_date: Date;
+    closing_date: string;
     status: string;
 };
 
@@ -27,15 +26,51 @@ const JobSchema = z.object({
     status: z.enum(["open", "closed"], { message: "Status must be 'open' or 'closed'" }),
 });
 
-const Jobs: React.FC = ({ setjobsToggle, company_id, setJobData }: any) => {
+const Jobs: React.FC = ({
+    company_id,
+    setJobData,
+    updateJob,
+    job_id,
+    title,
+    company,
+    type,
+    salary,
+    description,
+    requirement,
+    status,
+    closingDate,
+    onClose
+
+}: any) => {
     const { toast } = useToast()
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<JobData>({
         resolver: zodResolver(JobSchema),
+        defaultValues: {
+            title: "",
+            description: "",
+            requirement: "",
+            jobtype: "onsite",
+            closing_date: "",
+            status: "open",
+        },
     });
+    useEffect(() => {
+        if (updateJob) {
+            reset({
+                title,
+                description,
+                requirement,
+                jobtype: type,
+                closing_date: closingDate,
+                status: status,
+            });
+        }
+    }, [updateJob, reset, title, description, requirement, type, closingDate, status]);
     const navigate = useNavigate();
     const onSubmit: SubmitHandler<JobData> = async (data) => {
         try {
             const res = await axios.post('http://localhost:8000/postjob', {
+                job_id: job_id || undefined,
                 company_id: company_id,
                 title: data.title,
                 description: data.description,
@@ -43,29 +78,46 @@ const Jobs: React.FC = ({ setjobsToggle, company_id, setJobData }: any) => {
                 jobtype: data.jobtype,
                 closing_date: data.closing_date,
                 status: data.status
-            })
+            });
+
             if (res.data.success) {
-                setJobData((prev: any) => [...prev, data]);
+                if (!job_id) {
+                    const newJob = { ...data, job_id: res.data.data.job_id };
+                    setJobData((prev: any) => [...prev, newJob]);
+                } else {
+                    setJobData((prev: any) => {
+                        return prev.map((prevData) => {
+                            if (prevData.job_id === job_id) {
+                                return {
+                                    ...prevData,
+                                    ...data,
+                                    job_id: prevData.job_id
+                                };
+                            }
+                            return prevData;
+                        });
+                    });
+                }
+
                 toast({
-                    title: "yess!",
-                    description: res.data.message
-                })
+                    title: "Success!",
+                    description: res.data.message,
+                });
             }
         } catch (err) {
-            console.log("error posting jobs", err);
+            console.log("Error posting job", err);
             toast({
-                title: "Ooops",
+                title: "Oops",
                 description: 'Job posting failed',
-                variant: "destructive"
-            })
+                variant: "destructive",
+            });
         }
     };
-
     return (
         <div
             className="h-10/12 w-10/12 max-h-screen max-w-screen overflow-y-scroll scrollbar-hide overflow-hidden border-2 rounded-lg z-10 bg-gray-100 border-customPurple fixed top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-6"
         >
-            <Button className='bg-customPurple px-6 ' onClick={() => { setjobsToggle(prev => !prev) }}>Back</Button>
+            <Button className='bg-customPurple px-6 ' onClick={() => { onClose() }}>Back</Button>
             <h1 className="text-2xl font-bold text-center mb-6 font-Lato">Create Job</h1>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>

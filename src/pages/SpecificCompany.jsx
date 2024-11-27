@@ -115,6 +115,7 @@ export default function SpecificCompany() {
                         jobData.length > 0 && jobData.map((job) => (
                             <div key={job.job_id} className='flex flex-col my-2'>
                                 <JobCard
+                                    setjobsToggle={setjobsToggle}
                                     applicant_count={job.applicant_count}
                                     cvs={job.cvs}
                                     job_id={job.job_id}
@@ -133,7 +134,12 @@ export default function SpecificCompany() {
                             </div>
                         ))
                     )}
-                    {jobToggle && <Jobs setjobsToggle={setjobsToggle} company_id={id} setJobData={setJobData} />}
+                    {jobToggle && <Jobs
+                        onClose={() => { setjobsToggle(false) }}
+                        company_id={id}
+                        setJobData={setJobData}
+
+                    />}
 
                 </div>
 

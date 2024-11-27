@@ -35,31 +35,41 @@ export const postJobs = async (req, res) => {
     try {
 
         const data = req.body;
+        let rows;
         if (!data.company_id || !data.title || !data.description || !data.requirement || !data.jobtype || !data.closing_date || !data.status) {
             return res.status(400).json({
                 message: "All fields are required",
                 success: false,
             });
         }
-        console.log(data);
-        let insertQuery = 'Insert into jobs (company_id,title,description,requirement,jobtype,closing_date,status) values ($1,$2,$3,$4,$5,$6,$7) returning *'
-        let QueryParams = [data.company_id, data.title, data.description, data.requirement, data.jobtype, data.closing_date, data.status];
-        const { rows } = await pool.query(insertQuery, QueryParams);
-        if (rows.length === 0) {
-            return res.status(401).json({
+        if (data.job_id) {
+            let UpdateQuery = `Update jobs set company_id=$1,title=$2,description=$3,requirement=$4,jobtype=$5,closing_date=$6,status=$7 where job_id=$8 RETURNING *`
+            let QueryParams = [data.company_id, data.title, data.description, data.requirement, data.jobtype, data.closing_date, data.status, data.job_id];
+            rows = await pool.query(UpdateQuery, QueryParams);
+        }
+        // console.log(data);
+        else {
+            let insertQuery = 'Insert into jobs (company_id,title,description,requirement,jobtype,closing_date,status) values ($1,$2,$3,$4,$5,$6,$7) returning *'
+            let QueryParams = [data.company_id, data.title, data.description, data.requirement, data.jobtype, data.closing_date, data.status];
+            rows = await pool.query(insertQuery, QueryParams);
+        }
+        if (rows.rows.length === 0) {
+            return res.status(404).json({
                 message: "error posting jobs",
                 success: false
             })
         }
+        // console.log("rowsss",rows.rows[0]);
         return res.status(200).json({
-            message: "jobs posted successfully",
-            success: true
+            message: `job ${data.job_id ? "updated" : "posted"} successfully`,
+            success: true,
+            data: rows.rows[0]
         })
 
     } catch (err) {
         console.log(err.message);
         return res.status(500).json({
-            message: "error posting job",
+            message: "An error occurred while posting the job. Please try again later.",
             success: false
         })
     }
@@ -68,8 +78,14 @@ export const postJobs = async (req, res) => {
 export const deleteJob = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("idd", id);
+        if (!id) {
+            return res.status(400).json({
+                message: "Job ID is required",
+                success: false
+            });
+        }
         await pool.query('BEGIN');
-        await pool.query('SAVEPOINT SP');
         const checkQuery = 'SELECT * FROM jobs WHERE job_id = $1';
         const checkResult = await pool.query(checkQuery, [id]);
         if (checkResult.rows.length === 0) {
@@ -78,12 +94,11 @@ export const deleteJob = async (req, res) => {
                 success: false
             });
         }
-        await pool.query('SAVEPOINT SP1');
         const deleteQuery = 'DELETE FROM jobs WHERE job_id = $1';
         const deleteResult = await pool.query(deleteQuery, [id]);
 
         if (deleteResult.rowCount === 0) {
-            await pool.query('ROLLBACK TO SP1');
+            await pool.query('ROLLBACK');
             return res.status(500).json({
                 message: "Failed to delete job",
                 success: false
