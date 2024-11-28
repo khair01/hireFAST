@@ -57,7 +57,7 @@ const ApplyJobs = () => {
           No jobs Posted yett
         </h6>
       ) : (
-        <div className="max-w-6xl sm:w-3/4 mx-auto mt-4">
+        <div className=" max-w-[1200px] mx-auto mt-4 flex gap-x-6 flex-wrap">
           {filteredJobs.length > 0 && filteredJobs.map((job) => (
             <div key={job.job_id} className=' my-2'>
               <JobCard

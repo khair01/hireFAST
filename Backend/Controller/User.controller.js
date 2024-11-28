@@ -2,11 +2,10 @@ import { pool } from '../Database/database.js'; // Import your PostgreSQL pool c
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-// User Registration
 export const register = async (req, res) => {
     const { firstName, lastName, email, phone_number, password, role } = req.body;
 
-    // Validate input
+
     if (!firstName || !lastName || !email || !password || !role) {
         return res.status(400).json({
             message: "Some Fields are missing",

@@ -147,13 +147,13 @@ export default function JobCard({
   }
   return (
     <>
-      <div className="bg-white shadow-lg rounded-xl border-customPurple p-6 border hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-white shadow-md rounded-3xl  p-6 border hover:shadow-2xl transition-shadow duration-300 w-[380px] min-h-[350px] mx-auto relative">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold font-Montserrat text-customBlack">
             {title}
           </h2>
           {hasEmployerOpened && <AlertDialog>
-            <AlertDialogTrigger className='absolute right-0 mb-16'><IoMdClose className="absolute mb-14 right-5" /></AlertDialogTrigger>
+            <AlertDialogTrigger className='absolute right-[-15px] mb-16'><IoMdClose className="absolute mb-14 right-5" /></AlertDialogTrigger>
             <AlertDialogContent className='bg-customWhite border-customPurple'>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -169,7 +169,7 @@ export default function JobCard({
           </AlertDialog>}
           <div className="flex flex-row">
             <span
-              className={`text-sm ${status === 'open' ? 'bg-green-600' : 'bg-yellow-500'} py-1 text-white px-4 rounded font-Roboto`}
+              className={`text-sm ${status === 'open' ? 'bg-green-600' : 'bg-red-600'} py-1 rounded-md  text-white px-4  font-Roboto`}
             >
               {status}
             </span>

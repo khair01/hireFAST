@@ -81,7 +81,7 @@ export default function Signup() {
       <Navbar />
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="bg-white border w-full max-w-lg p-6 rounded-lg shadow-md mt-20">
-          <h1 className="text-2xl font-bold text-purple-700 mb-4 text-center">
+          <h1 className="text-2xl font-bold text-customPurple mb-4 text-center">
             Sign Up
           </h1>
           <form
@@ -155,7 +155,7 @@ export default function Signup() {
 
             <button
               type="submit"
-              className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 disabled:bg-purple-300"
+              className="w-full bg-customPurple text-white py-2 rounded-md hover:bg-purple-700 disabled:bg-purple-300"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Sign Up"}

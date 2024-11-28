@@ -77,7 +77,7 @@ export default function SpecificCompany() {
 
     return (
         <>
-            <section className='flex mt-[68px] justify-between w-full bg-gradient-to-r from-blue-100 via-purple-100 to-blue-50 '>
+            <section className='flex mt-[68px] justify-between w-full  '>
                 <div className='flex  '>
                     <div className=' ml-6'>
                         <Avatar className="w-40 h-40 object-contain">
@@ -95,7 +95,7 @@ export default function SpecificCompany() {
             <Separator className="mt-6" />
 
             <section className='mt-4 '>
-                <div className='border-[1px] md:mx-auto rounded-lg px-4 py-6 bg-gradient-to-r from-blue-100 via-purple-100 to-blue-50  '>
+                <div className='border-[1px] md:mx-auto rounded-lg px-4 py-6   '>
                     <h1 className=' text-xl font-bold text-gray-800  mb-2 font-Montserrat '>About Us</h1>
                     <p className=" break-words word-wrap text-wrap text-justify text-sm pl-2 text-gray-600">
                         {companyData.description}
@@ -112,27 +112,29 @@ export default function SpecificCompany() {
                             Company has no recent Openings
                         </h6>
                     ) : (
-                        jobData.length > 0 && jobData.map((job) => (
-                            <div key={job.job_id} className='flex flex-col my-2'>
-                                <JobCard
-                                    setjobsToggle={setjobsToggle}
-                                    applicant_count={job.applicant_count}
-                                    cvs={job.cvs}
-                                    job_id={job.job_id}
-                                    title={job.title}
-                                    company_id={companyData.company_id}
-                                    company={companyData.company_name}
-                                    type={job.jobtype}
-                                    description={job.description}
-                                    requirement={job.requirement}
-                                    posted_date={job.posted_date}
-                                    closing_date={job.closing_date}
-                                    status={job.status}
-                                    hasEmployerOpened={hasEmployerOpened}
-                                    setJobData={setJobData}
-                                />
-                            </div>
-                        ))
+                        <div className=" max-w-[1200px] mx-auto mt-4 flex gap-x-6 flex-wrap">
+                            {jobData.length > 0 && jobData.map((job) => (
+                                <div key={job.job_id} className='my-2'>
+                                    <JobCard
+                                        setjobsToggle={setjobsToggle}
+                                        applicant_count={job.applicant_count}
+                                        cvs={job.cvs}
+                                        job_id={job.job_id}
+                                        title={job.title}
+                                        company_id={companyData.company_id}
+                                        company={companyData.company_name}
+                                        type={job.jobtype}
+                                        description={job.description}
+                                        requirement={job.requirement}
+                                        posted_date={job.posted_date}
+                                        closing_date={job.closing_date}
+                                        status={job.status}
+                                        hasEmployerOpened={hasEmployerOpened}
+                                        setJobData={setJobData}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     )}
                     {jobToggle && <Jobs
                         onClose={() => { setjobsToggle(false) }}

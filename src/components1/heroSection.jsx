@@ -4,7 +4,7 @@ const HeroSection = ({ jobData, setJobData, handleSearchChange, searchQuery }) =
 
 
   return (
-    <div className="flex justify-center items-center pt-56">
+    <div className="flex justify-center items-center pt-52">
       <div className="text-center py-46 bg-customWhite">
         <span className="mx-auto px-6 py-2 rounded-full bg-gray-100 text-[#F83002] font-medium font-Lato">
           Job Hunt !!

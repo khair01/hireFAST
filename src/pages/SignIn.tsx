@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx'
 import Navbar from "../components1/navbar.jsx";
 import { FaEye } from "react-icons/fa";
+import { useToast } from "@/hooks/use-toast.js";
 
 const registerschema = z.object({
   email: z.string().email(),
@@ -18,6 +19,7 @@ type FormFields = z.infer<typeof registerschema>;
 export default function Signin() {
   const { authState, setAuthState } = useAuth();
   const [togglePassword, settogglepassword] = useState(false)
+  const { toast } = useToast();
   const Navigate = useNavigate();
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<FormFields>(
     {
@@ -46,11 +48,20 @@ export default function Signin() {
         isAuthorized: true,
         loading: false
       })
+      toast({
+        title: "Success",
+        description: "sign in successfull",
+      });
       Navigate("/");
 
     } catch (error) {
       console.log(error.response ? error.response.data : error.message);
-      console.log("Registration failed");
+      toast({
+        title: "Error",
+        description: "Registration failed. Please try again.",
+        variant: "destructive",
+      });
+      console.log("Sign in failed");
     }
   }
 
@@ -65,7 +76,7 @@ export default function Signin() {
         </div>
         <div className="flex justify-center items-center w-full md:w-auto min-h-screen bg-customWhite">
           <div className="bg-white w-full md:w-auto max-w-xs py-6 px-8 flex flex-col items-center border-2 rounded-md shadow-md mx-20 -my-20 md:my-0">
-            <h1 className="text-3xl font-bold text-purple-700 mb-4 text-center">
+            <h1 className="text-3xl font-bold text-customPurple mb-4 text-center">
               Sign In
             </h1>
             <form
